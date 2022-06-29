@@ -49,7 +49,7 @@ config(){
 dl(){
   cd $DIR/openwrt/
   read -p "`echo -e "$YELLOW请选择下载次数：$END"`" input
-  [[ $input =~ [^0-9] ]] && { echo -e "$RED请输入数字$END";exit 1; }
+  [[ $input =~ [^0-9] ]] && { echo -e "\t$RED请输入数字$END";dl; }
   for ((i=1;i<=$input;i++));do
     echo -e "$OTHER开始第$i次下载DL库$END"
     make -j8 download V=s && echo -e "$OTHER第$i次下载DL库完成$END"
@@ -67,7 +67,7 @@ make2(){
   export FORCE_UNSAFE_CONFIGURE=1
   export FORCE=1
   read -p "`echo -e "$YELLOW请选择编译线程数，第一次建议1线程：$END"`" input
-  [[ $input =~ [^0-9] ]] && { echo -e "$RED请输入数字$END";exit 1; }
+  [[ $input =~ [^0-9] ]] && { echo -e "\t$RED请输入数字$END";make2; }
   echo -e "$OTHER开始编译咯！$END"
   make -j$input V=s
 }
