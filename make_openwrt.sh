@@ -48,7 +48,7 @@ config(){
 }
 dl(){
   cd $DIR/openwrt/
-  read -p "`echo -e "$YELLOW请选择下载次数：$END"`" input
+  read -p "`echo -e "$YELLOW请输入下载DL库的次数：$END"`" input
   [[ $input =~ [^0-9] ]] && { echo -e "\t$RED请输入数字$END";dl; }
   for ((i=1;i<=$input;i++));do
     echo -e "$OTHER开始第$i次下载DL库$END"
