@@ -5,8 +5,8 @@ OTHER="\e[1;$[RANDOM%7+31]m"
 END='\e[0m'
 trap '' int quit
 echo "此脚本用于编译openwrt固件，不要使用CentOS系统"
-read -p "`echo -e "$YELLOW请选择工作空间，默认为/data    $END"`" INPUT
-DIR=${INPUT:-/data}
+read -p "`echo -e "$YELLOW请选择工作空间，默认为`pwd`    $END"`" INPUT
+DIR=${INPUT:-`pwd`}
 os_type(){
   grep centos /etc/os-release &> /dev/null && echo "centos"
 }
@@ -21,7 +21,7 @@ apt1(){
 }
 git1(){
   if [ ! -d $DIR ];then
-  mkdir -p $DIR
+  mkdir -p $DIR||exit 1
   fi
   if [ -d $DIR/openwrt/ ];then
     echo -e "$RED已经存在了相同的文件$END"
