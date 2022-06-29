@@ -5,8 +5,10 @@ OTHER="\e[1;$[RANDOM%7+31]m"
 END='\e[0m'
 trap '' int quit
 echo "此脚本用于编译openwrt固件，不要使用CentOS系统"
-read -p "`echo -e "$YELLOW请选择工作空间，默认为`pwd`    $END"`" INPUT
-DIR=${INPUT:-`pwd`}
+pwd=`pwd`
+read -e -p "`echo -e "$YELLOW请选择工作空间，默认为$pwd    $END"`" INPUT
+DIR=${INPUT:-$pwd}
+[ ! -d $DIR ] && mkdir -p $DIR
 os_type(){
   grep centos /etc/os-release &> /dev/null && echo "centos"
 }
@@ -20,39 +22,38 @@ apt1(){
   fi
 }
 git1(){
-  if [ ! -d $DIR ];then
-  mkdir -p $DIR||exit 1
-  fi
-  if [ -d $DIR/openwrt/ ];then
-    echo -e "$RED已经存在了相同的文件$END"
+  if [ ! -d $DIR/openwrt/ ];then
+    echo -e "${YELLOW}开始拉取源码$END"
+    git clone https://github.com/openwrt/openwrt.git $DIR/openwrt/
   else
-    cd $DIR/ && git clone https://github.com/openwrt/openwrt.git
+    echo -e "${RED}$DIR/openwrt/ 文件已经存在$END"
   fi
 }
 src2(){
+  echo -e "${YELLOW}开始编辑src-git$END"
   cd $DIR/openwrt/
   [ ! -e feeds.conf.default.bak ] && cp feeds.conf.default feeds.conf.default.bak
   vi feeds.conf.default
 }
 feed(){
-  echo -e "$YELLOW更新feed$END"
-  cd $DIR/openwrt/scripts/
-  /usr/bin/env  perl feeds update -a
-  echo -e "$YELLOW安装feed$END"
-  cd $DIR/openwrt/scripts/
-  /usr/bin/env  perl feeds install -a
+  echo -e "$YELLOW更新feed$END" &&
+  cd $DIR/openwrt/scripts/ && /usr/bin/env  perl feeds update -a &&
+  echo -e "$YELLOW安装feed$END" &&
+  cd $DIR/openwrt/scripts/ && /usr/bin/env  perl feeds install -a
 }
 config(){
-  cd $DIR/openwrt/ && echo -e "$OTHER开始配置文件吧$END"
-  make menuconfig
+  echo -e "$OTHER开始配置文件吧$END"
+  cd $DIR/openwrt/ && make menuconfig
 }
 dl(){
   cd $DIR/openwrt/
-  read -p "`echo -e "$YELLOW请输入下载DL库的次数：$END"`" input
-  [[ $input =~ [^0-9] ]] && { echo -e "\t$RED请输入数字$END";exit 1; }
-  for ((i=1;i<=$input;i++));do
+  read -n 1 -p "`echo -e "$YELLOW请输入下载DL库的线程数：$END"`" input1
+  read -n 1 -p "`echo -e "$YELLOW请输入下载DL库的次数：$END"`" input2
+  [[ $input1 =~ [0-9] ]] || { echo -e "$RED请输入数字$END";exit 1; }
+  [[ $input2 =~ [0-9] ]] || { echo -e "$RED请输入数字$END";exit 1; }
+  for ((i=1;i<=$input2;i++));do
     echo -e "$OTHER开始第$i次下载DL库$END"
-    make -j8 download V=s && echo -e "$OTHER第$i次下载DL库完成$END"
+    make -j$input1 download V=s && echo -e "$OTHER第$i次下载DL库完成$END"
   done
 }
 make1(){
@@ -63,13 +64,11 @@ make1(){
   make -j1 V=s
 }
 make2(){
-  cd $DIR/openwrt/
-  export FORCE_UNSAFE_CONFIGURE=1
-  export FORCE=1
-  read -p "`echo -e "$YELLOW请选择编译线程数，第一次建议1线程：$END"`" input
-  [[ $input =~ [^0-9] ]] && { echo -e "\t$RED请输入数字$END";exit 1; }
+  cd $DIR/openwrt/ && export FORCE_UNSAFE_CONFIGURE=1 && export FORCE=1
+  read -n 1 -p "`echo -e "$YELLOW请输入编译线程数：$END"`" input3
+  [[ $input3 =~ [0-9] ]] || { echo -e "$RED请输入数字$END";exit 1; }
   echo -e "$OTHER开始编译咯！$END"
-  make -j$input V=s
+  make -j$input3 V=s
 }
 dirclean2(){
   cd $DIR/openwrt/ && make dirclean
@@ -81,29 +80,32 @@ defconfig2(){
   make defconfig
 }
 delete_dir3(){
-  cd $DIR/openwrt/
-  rm -rf build_dir/ staging_dir/ tmp/
+  cd $DIR/openwrt/ && rm -rf build_dir/ staging_dir/ tmp/
 }
 qt5_3(){
-  cd $DIR/openwrt/dl/
-  wget https://download.qt.io/archive/qt/5.9/5.9.8/single/qt-everywhere-opensource-src-5.9.8.tar.xz
+  wget -P $DIR/openwrt/dl/ https://download.qt.io/archive/qt/5.9/5.9.8/single/qt-everywhere-opensource-src-5.9.8.tar.xz
 }
 re_config3(){
-  cd $DIR/openwrt/
-  rm -rf ./tmp && rm -rf .config
+  cd $DIR/openwrt/ && rm -rf ./tmp && rm -rf .config
 }
 single_4(){
-  config
-  echo -e "${YELLOW}开始下载DL库:  $END"
+  config && echo -e "${YELLOW}配置结束，开始下载DL库:  $END"
   dl && echo -e "${GREEN}下载DL库--成功$END"||echo -e "${RED}下载DL库--失败$END"
+  echo
   read -p "`echo -e "${YELLOW}请输入单独编译插件的名字:  $END"`" name
-  echo -e "${YELLOW}你输入的插件名字为$END $RED${name}$END"
-  echo -e "${YELLOW}编译开始$END"
+  echo -e "你输入的插件名字为 $RED${name}$END
+  ${YELLOW}编译开始$END"
   make package/${name}/compile V=99
 }
 while :;do
-printf "$OTHER%s\n$END" '(0) 退出脚本' '(1) 首次编译' '(2) 二次编译' '(3) 其他' '(4) 编译插件'
-read -p "请输入: "
+  echo -e "$OTHER
+  (0) 退出脚本
+  (1) 首次编译
+  (2) 二次编译
+  (3) 其他
+  (4) 编译插件
+  $END"
+read -n 1 -p "请输入: "
   case $REPLY in 
     0)
       echo -e "$OTHER感谢使用此脚本，欢迎下次使用！$END"
@@ -111,8 +113,17 @@ read -p "请输入: "
     ;;
     1)
       while :;do
-      printf "$GREEN%s\n$END" '(0) 返回上一级' '(1) 安装相关依赖' '(2) 下载源码' '(3) feed更新及安装' '(4) 配置菜单' '(5) 下载DL库' '(6) 编译' '(7) 全部执行'
-      read -p "请输入: "
+      echo "$GREEN
+	  (0) 返回上一级 
+	  (1) 安装相关依赖 
+	  (2) 下载源码 
+	  (3) feed更新及安装 
+	  (4) 配置菜单
+	  (5) 下载DL库
+	  (6) 编译
+	  (7) 全部执行
+	  $END" 
+      read -n 1 -p "请输入: "
         case $REPLY in
           0)
             break
@@ -145,8 +156,18 @@ read -p "请输入: "
     ;;
     2)
       while :;do
-      printf "$YELLOW%s\n$END" '(0) 返回上一级' '(1) 清理所有编译文件' '(2) git pull' '(3) 编辑src-git' '(4) feed更新及安装' '(5) make defconfig' '(6) 配置菜单' '(7) 下载DL库' '(8) 编译'
-      read -p "请输入: "
+	    echo -e "$YELLOW
+	    (0) 返回上一级
+	    (1) 清理所有编译文件
+	    (2) git pull
+	    (3) 编辑src-git
+	    (4) feed更新及安装
+	    (5) make defconfig
+	    (6) 配置菜单
+	    (7) 下载DL库
+	    (8) 编译
+	    $END"
+      read -n 1 -p "请输入: "
         case $REPLY in
           0)
             break
@@ -182,8 +203,13 @@ read -p "请输入: "
     ;;
     3)
       while :;do
-      printf "$RED%s\n$END" '(0) 返回上一级' '(1) 删除build_dir、staging_dir以及tmp' '(2) 下载qt5包' '(3) 重新配置'
-      read -p "请输入: "
+	    echo -e "$RED
+	    (0) 返回上一级
+		(1) 删除build_dir、staging_dir以及tmp
+		(2) 下载qt5包
+		(3) 重新配置
+	    $END"
+      read -n 1 -p "请输入: "
         case $REPLY in
           0)
             break
