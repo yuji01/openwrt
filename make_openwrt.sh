@@ -198,9 +198,9 @@ read -n 1 -p "请输入: "
           8)
 	    make2 && echo -e "${GREEN}编译--成功$END"||echo -e "${RED}编译--失败$END"
           ;;
-		  9)
+	  9)
 	    dirclean2 && git2 && src2 && feed && defconfig2 && config && dl && make2
-		[ $? = 0 ] && echo -e "${GREEN}编译--成功$END"||echo -e "${RED}编译--失败$END"
+	    [ $? = 0 ] && echo -e "${GREEN}编译--成功$END"||echo -e "${RED}编译--失败$END"
           ;;
 	  *)
             echo -e "$RED\t输入错误，请重新输入$END"
