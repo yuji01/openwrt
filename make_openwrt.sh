@@ -11,7 +11,7 @@ DIR=${INPUT:-$pwd}
 [ ! -d $DIR ] && mkdir -p $DIR
 cd $DIR ||exit 1
 read -e -p "`echo -e "$YELLOW请选择版本，默认为openwrt，选择lean源码请输入${RED}lean$END    $END"`" INPUT2
-if [[ $INPUT2 == "lean" ]];then
+if [[ $INPUT2 = "lean" ]];then
   VERSION=lean
 else
   VERSION=openwrt
@@ -25,29 +25,33 @@ apt1(){
     echo -e "$RED该脚本不适用于centos$END"
     exit 1
   elif [ $VERSION = "openwrt" ];then
-    sudo apt-get update
-    sudo apt install -y build-essential ccache ecj fastjar file g++ gawk gettext git java-propose-classpath libelf-dev libncurses5-dev libncursesw5-dev libssl-dev python python2.7-dev python3 unzip wget python3-distutils python3-setuptools rsync subversion swig time xsltproc zlib1g-dev
+    sudo apt-get update &&
+    sudo apt install -y build-essential ccache ecj fastjar file g++ gawk gettext git java-propose-classpath libelf-dev libncurses5-dev libncursesw5-dev libssl-dev python python2.7-dev python3 unzip wget python3-distutils python3-setuptools rsync subversion swig time xsltproc zlib1g-dev &&
+	echo -e "${GREEN}安装依赖--成功$END"||echo -e "${RED}安装依赖--失败$END"
   else
-    sudo apt update -y
-    sudo apt full-upgrade -y
+    sudo apt update -y &&
+    sudo apt full-upgrade -y &&
     sudo apt install -y ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
     bzip2 ccache cmake cpio curl device-tree-compiler fastjar flex gawk gettext gcc-multilib g++-multilib \
     git gperf haveged help2man intltool libc6-dev-i386 libelf-dev libglib2.0-dev libgmp3-dev libltdl-dev \
     libmpc-dev libmpfr-dev libncurses5-dev libncursesw5-dev libreadline-dev libssl-dev libtool lrzsz \
     mkisofs msmtp nano ninja-build p7zip p7zip-full patch pkgconf python2.7 python3 python3-pip qemu-utils \
-    rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev
+    rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev &&
+	echo -e "${GREEN}安装依赖--成功$END"||echo -e "${RED}安装依赖--失败$END"
   fi
 }
 git1(){
   if [ ! -d $DIR/$VERSION/ ];then
     echo -e "${YELLOW}开始拉取源码$END"
-    git clone https://github.com/openwrt/openwrt.git $DIR/$VERSION/
+    git clone https://github.com/openwrt/openwrt.git $DIR/$VERSION/ &&
+	echo -e "${GREEN}下载源码--成功$END"||echo -e "${RED}下载源码--失败$END"
   else
     echo -e "${RED}$DIR/$VERSION/ 文件已经存在$END"
   fi
   if [ ! -d $DIR/$VERSION/ ];then
     echo -e "${YELLOW}开始拉取源码$END"
-    git clone https://github.com/coolsnowwolf/lede.git $DIR/$VERSION/
+    git clone https://github.com/coolsnowwolf/lede.git $DIR/$VERSION/ && 
+	echo -e "${GREEN}下载源码--成功$END"||echo -e "${RED}下载源码--失败$END"
   else
     echo -e "${RED}$DIR/$VERSION/ 文件已经存在$END"
   fi
@@ -67,59 +71,74 @@ feed(){
   echo -e "$YELLOW更新feed$END" &&
   /usr/bin/env  perl $DIR/$VERSION/scripts/feeds update -a &&
   echo -e "$YELLOW安装feed$END" &&
-  /usr/bin/env  perl $DIR/$VERSION/scripts/feeds install -a
+  /usr/bin/env  perl $DIR/$VERSION/scripts/feeds install -a &&
+  echo -e "${GREEN}feed更新及安装--成功$END"||echo -e "${RED}feed更新及安装--失败$END"
 }
 config(){
   echo -e "$OTHER开始配置文件吧$END"
-  cd $DIR/$VERSION/ && make menuconfig
+  cd $DIR/$VERSION/ && make menuconfig &&
+  echo -e "${GREEN}配置菜单--成功$END"||echo -e "${RED}配置菜单--失败$END"
 }
 dl_1(){
   echo -e "${YELLOW}下载DL库$END"
   cd $DIR/$VERSION/
-  make download V=s
+  make download V=s &&
+  echo -e "${GREEN}下载DL库--成功$END"||echo -e "${RED}下载DL库--失败$END"
 }
 dl_2(){
   cd $DIR/$VERSION/
-  read -n 1 -p "`echo -e "$YELLOW请输入下载DL库的线程数：$END"`" input1
-  [[ $input1 =~ [0-9] ]] || { echo -e "$RED请输入数字$END";exit 1; }
   read -n 1 -p "`echo -e "$YELLOW请输入下载DL库的次数：$END"`" input2
   [[ $input2 =~ [0-9] ]] || { echo -e "$RED请输入数字$END";exit 1; }
   for ((i=1;i<=$input2;i++));do
     echo -e "$OTHER开始第$i次下载DL库$END"
-    make -j$input1 download V=s && echo -e "$OTHER第$i次下载DL库完成$END"
+    make -j8 download V=s && echo -e "$OTHER第$i次下载DL库完成$END"
+    [ $i -eq $input2 ] && 
+	echo -e "${GREEN}下载DL库--成功$END"||echo -e "${RED}下载DL库--失败$END"
   done
 }
 make1(){
   cd $DIR/$VERSION/
   export FORCE_UNSAFE_CONFIGURE=1
   export FORCE=1
-  echo -e "$OTHER开始编译咯！$END"
-  make  V=s
+  echo -e "${OTHER}编译开始$END"
+  make  V=s &&
+  echo -e "${GREEN}编译--成功$END" || echo -e "${RED}编译--失败$END"
 }
 make2(){
   cd $DIR/$VERSION/ && export FORCE_UNSAFE_CONFIGURE=1 && export FORCE=1
   read -n 1 -p "`echo -e "$YELLOW请输入编译线程数：$END"`" input3
   [[ $input3 =~ [0-9] ]] || { echo -e "$RED请输入数字$END";exit 1; }
   echo -e "$OTHER开始编译咯！$END"
-  make -j$input3 V=s
+  make -j$input3 V=s &&
+  echo -e "${GREEN}编译--成功$END" || echo -e "${RED}编译--失败$END"
 }
 dirclean2(){
-  cd $DIR/$VERSION/ && make dirclean
+  cd $DIR/$VERSION/
+  make dirclean &&
+  echo -e "${GREEN}清理所有编译文件--成功$END"||echo -e "${RED}清理所有编译文件--失败$END"
 }
 git2(){
-  cd $DIR/$VERSION/ && git pull
+  cd $DIR/$VERSION/
+  git pull &&
+  echo -e "${GREEN}git pull--成功$END"||echo -e "${RED}git pull--失败$END"
 }
 defconfig2(){
-  cd $DIR/$VERSION/ && make defconfig
+  cd $DIR/$VERSION/
+  make defconfig &&
+  echo -e "${GREEN}make defconfig--成功$END"||echo -e "${RED}make defconfig--失败$END"
 }
 delete_dir3(){
-  cd $DIR/$VERSION/ && rm -rf build_dir/ staging_dir/ tmp/
+  cd $DIR/$VERSION/
+  rm -rf build_dir/ staging_dir/ tmp/ &&
+  echo -e "${GREEN}删除build_dir、staging_dir以及tmp--成功$END"||echo -e "${RED}删除build_dir、staging_dir以及tmp--失败$END"
 }
 qt5_3(){
-  wget -P $DIR/$VERSION/dl/ https://download.qt.io/archive/qt/5.9/5.9.8/single/qt-everywhere-opensource-src-5.9.8.tar.xz
+  wget -P $DIR/$VERSION/dl/ https://download.qt.io/archive/qt/5.9/5.9.8/single/qt-everywhere-opensource-src-5.9.8.tar.xz &&
+  echo -e "${GREEN}下载qt5包--成功$END"||echo -e "${RED}下载qt5包--失败$END"
 }
 re_config3(){
-  cd $DIR/$VERSION/ && rm -rf ./tmp && rm -rf .config
+  cd $DIR/$VERSION/ && rm -rf ./tmp && rm -rf .config &&
+  echo -e "${GREEN}重新配置--成功$END"||echo -e "${RED}重新配置--失败$END"
 }
 single_4(){
   config && echo -e "${YELLOW}配置结束，开始下载DL库:  $END"
@@ -128,16 +147,18 @@ single_4(){
   read -p "`echo -e "${YELLOW}请输入单独编译插件的名字:  $END"`" name
   echo -e "你输入的插件名字为 $RED${name}$END
   ${YELLOW}编译开始$END"
-  make package/${name}/compile V=99
+  make package/${name}/compile V=99 &&
+  echo -e "${GREEN}编译插件${name}--成功$END" || echo -e "${RED}编译插件${name}--失败$END"
 }
 while :;do
   echo -e "
-此脚本功能如下：$OTHER
-  (0) 退出脚本
-  (1) 首次编译
-  (2) 二次编译
-  (3) 其他
-  (4) 编译插件
+此脚本功能如下：
+  $OTHER
+  [0] 退出脚本
+  [1] 首次编译
+  [2] 二次编译
+  [3] 其他
+  [4] 编译插件
   $END"
 read -n 1 -p "请输入: "
   case $REPLY in 
@@ -164,34 +185,28 @@ read -n 1 -p "请输入: "
             break
           ;;
 	  1)
-	    apt1 && echo -e "${GREEN}安装依赖--成功$END"||echo -e "${RED}安装依赖--失败$END"
+	    apt1
 	  ;;
           2)
-	    git1 && echo -e "${GREEN}下载源码--成功$END"||echo -e "${RED}下载源码--失败$END"
+	    git1
           ;;
           3)
-	    tag_1 && echo -e "${GREEN}切换tag--成功$END"||echo -e "${RED}切换tag--失败$END"
+	    tag_1
           ;;
           4)
-	    feed && echo -e "${GREEN}feed更新及安装--成功$END"||echo -e "${RED}feed更新及安装--失败$END"
+	    feed
           ;;
           5)
-	    config && echo -e "${GREEN}配置菜单--成功$END"||echo -e "${RED}配置菜单--失败$END"
+	    config
           ;;
           6)
-	    dl_1 && echo -e "${GREEN}下载DL库--成功$END"||echo -e "${RED}下载DL库--失败$END"
+	    dl_1
           ;;
           7)
-	    make1 && echo -e "${GREEN}编译--成功$END" || echo -e "${RED}编译--失败$END"
+	    make1
           ;;
           8)
-	    apt1 && echo -e "${GREEN}安装依赖--成功$END"||echo -e "${RED}安装依赖--失败$END"
-	    git1 && echo -e "${GREEN}下载源码--成功$END"||echo -e "${RED}下载源码--失败$END"
-	    tag_1 && echo -e "${GREEN}切换tag--成功$END"||echo -e "${RED}切换tag--失败$END"
-	    feed && echo -e "${GREEN}feed更新及安装--成功$END"||echo -e "${RED}feed更新及安装--失败$END"
-	    config && echo -e "${GREEN}配置菜单--成功$END"||echo -e "${RED}配置菜单--失败$END"
-	    dl_1 && echo -e "${GREEN}下载DL库--成功$END"||echo -e "${RED}下载DL库--失败$END"
-	    make1 && echo -e "${GREEN}编译--成功$END" || echo -e "${RED}编译--失败$END"
+	    apt1 && git1 && tag_1 && feed && config && dl_1 && make1
           ;;
 	  *)
             echo -e "$RED\t输入错误，请重新输入$END"
@@ -200,56 +215,49 @@ read -n 1 -p "请输入: "
     ;;
     2)
       while :;do
-	    echo -e "$YELLOW
-	    (0) 返回上一级
-	    (1) 清理所有编译文件
-	    (2) git pull
-	    (3) 编辑src-git
-	    (4) feed更新及安装
-	    (5) make defconfig
-	    (6) 配置菜单
-	    (7) 下载DL库
-	    (8) 编译
-	    (9) 全部执行
-	    $END"
+        echo -e "$YELLOW
+	(0) 返回上一级
+	(1) 清理所有编译文件
+	(2) git pull
+	(3) 编辑src-git
+	(4) feed更新及安装
+	(5) make defconfig
+	(6) 配置菜单
+	(7) 下载DL库
+	(8) 编译
+	(9) 全部执行
+	$END"
       read -n 1 -p "请输入: "
         case $REPLY in
           0)
             break
           ;;
           1)
-	    dirclean2 && echo -e "${GREEN}清理所有编译文件--成功$END"||echo -e "${RED}清理所有编译文件--失败$END"
+	    dirclean2
           ;;
           2)
-	    git2 && echo -e "${GREEN}git pull--成功$END"||echo -e "${RED}git pull--失败$END"
+	    git2
           ;;
           3)
-	    src2 && echo -e "${GREEN}编译src-git--成功$END"||echo -e "${RED}编译src-git--失败$END"
+	    src2
           ;;
           4)
-	    feed && echo -e "${GREEN}feed更新及安装--成功$END"||echo -e "${RED}feed更新及安装--失败$END"
+	    feed
           ;;
           5)
-	    defconfig2 && echo -e "${GREEN}make defconfig--成功$END"||echo -e "${RED}make defconfig--失败$END"
+	    defconfig2
           ;;
           6)
-	    config && echo -e "${GREEN}配置菜单--成功$END"||echo -e "${RED}配置菜单--失败$END"
+	    config
           ;;
           7)
-	    dl_2 && echo -e "${GREEN}下载DL库--成功$END"||echo -e "${RED}下载DL库--失败$END"
+	    dl_2
           ;;
           8)
-	    make2 && echo -e "${GREEN}编译--成功$END"||echo -e "${RED}编译--失败$END"
+	    make2
           ;;
 	  9)
-	    dirclean2 && echo -e "${GREEN}清理所有编译文件--成功$END"||echo -e "${RED}清理所有编译文件--失败$END"
-	    git2 && echo -e "${GREEN}git pull--成功$END"||echo -e "${RED}git pull--失败$END"
-	    src2 && echo -e "${GREEN}编译src-git--成功$END"||echo -e "${RED}编译src-git--失败$END"
-	    feed && echo -e "${GREEN}feed更新及安装--成功$END"||echo -e "${RED}feed更新及安装--失败$END"
-	    defconfig2 && echo -e "${GREEN}make defconfig--成功$END"||echo -e "${RED}make defconfig--失败$END"
-	    config && echo -e "${GREEN}配置菜单--成功$END"||echo -e "${RED}配置菜单--失败$END"
-	    dl_2 && echo -e "${GREEN}下载DL库--成功$END"||echo -e "${RED}下载DL库--失败$END"
-	    make2 && echo -e "${GREEN}编译--成功$END"||echo -e "${RED}编译--失败$END"
+	    dirclean2 && git2 && src2 && feed && defconfig2 && config && dl_2 && make2
           ;;
 	  *)
             echo -e "$RED\t输入错误，请重新输入$END"
@@ -270,21 +278,21 @@ read -n 1 -p "请输入: "
             break
           ;;
           1)
-            delete_dir3 && echo -e "${GREEN}删除build_dir、staging_dir以及tmp--成功$END"||echo -e "${RED}删除build_dir、staging_dir以及tmp--失败$END"
+            delete_dir3
           ;;
           2)
-            qt5_3 && echo -e "${GREEN}下载qt5包--成功$END"||echo -e "${RED}下载qt5包--失败$END"
+            qt5_3
           ;;
           3)
-            re_config && echo -e "${GREEN}重新配置--成功$END"||echo -e "${RED}重新配置--失败$END"
+            re_config3
           ;;
-	      *)
+	  *)
             echo -e "$RED\t输入错误，请重新输入$END"
         esac
       done
     ;;
     4)
-      single_4 && echo -e "${GREEN}编译插件${name}--成功$END" || echo -e "${RED}编译插件${name}--失败$END"
+      single_4
 	;;
     *)
       echo -e "$RED\t输入错误，请重新输入$END"
