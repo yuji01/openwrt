@@ -4,12 +4,19 @@ GREEN='\e[1;32m'
 OTHER="\e[1;$[RANDOM%7+31]m"
 END='\e[0m'
 trap '' int quit
-echo "此脚本用于编译openwrt固件，不要使用CentOS系统"
+echo -e "$OTHER此脚本用于编译openwrt固件，不要使用CentOS系统$END"
 pwd=`pwd`
 read -e -p "`echo -e "$YELLOW请选择工作空间，默认为$pwd    $END"`" INPUT
 DIR=${INPUT:-$pwd}
 [ ! -d $DIR ] && mkdir -p $DIR
 cd $DIR ||exit 1
+read -e -p "`echo -e "$YELLOW请选择版本，默认为openwrt，选择lean源码请输入${RED}lean$END    $END"`" INPUT2
+if [ $INPUT2 = "lean" ];then
+  VERSION=lean
+else
+  VERSION=openwrt
+fi
+echo -e "选择的版本为$RED$VERSION$END"
 os_type(){
   grep centos /etc/os-release &> /dev/null && echo "centos"
 }
@@ -23,41 +30,48 @@ apt1(){
   fi
 }
 git1(){
-  if [ ! -d $DIR/openwrt/ ];then
+  if [ ! -d $DIR/$VERSION/ ];then
     echo -e "${YELLOW}开始拉取源码$END"
-    git clone https://github.com/openwrt/openwrt.git $DIR/openwrt/
+    git clone https://github.com/openwrt/openwrt.git $DIR/$VERSION/
   else
-    echo -e "${RED}$DIR/openwrt/ 文件已经存在$END"
+    echo -e "${RED}$DIR/$VERSION/ 文件已经存在$END"
+  fi
+  else
+  if [ ! -d $DIR/$VERSION/ ];then
+    echo -e "${YELLOW}开始拉取源码$END"
+    git clone https://github.com/coolsnowwolf/lede.git $DIR/$VERSION/
+  else
+    echo -e "${RED}$DIR/$VERSION/ 文件已经存在$END"
   fi
 }
 tag_1(){
   echo -e "$YELLOW此源码包含的tag如下：$END" &&
-  cd $DIR/openwrt/ && git tag
+  cd $DIR/$VERSION/ && git tag
   read -e -p "请输入你要选择的tag：" input0
   git checkout $input0 && echo -e "${GREEN}你已经成功切换分支为$END${YELLOW}$input0$END"||echo -e "${RED}切换tag失败$END"
 }
 src2(){
   echo -e "${YELLOW}开始编辑src-git$END"
-  [ ! -e $DIR/openwrt/feeds.conf.default.bak ] && cp $DIR/openwrt/feeds.conf.default $DIR/openwrt/feeds.conf.default.bak
-  vi $DIR/openwrt/feeds.conf.default
+  [ ! -e $DIR/$VERSION/feeds.conf.default.bak ] && cp $DIR/$VERSION/feeds.conf.default $DIR/$VERSION/feeds.conf.default.bak
+  vi $DIR/$VERSION/feeds.conf.default
 }
 feed(){
   echo -e "$YELLOW更新feed$END" &&
-  /usr/bin/env  perl $DIR/openwrt/scripts/feeds update -a &&
+  /usr/bin/env  perl $DIR/$VERSION/scripts/feeds update -a &&
   echo -e "$YELLOW安装feed$END" &&
-  /usr/bin/env  perl $DIR/openwrt/scripts/feeds install -a
+  /usr/bin/env  perl $DIR/$VERSION/scripts/feeds install -a
 }
 config(){
   echo -e "$OTHER开始配置文件吧$END"
-  cd $DIR/openwrt/ && make menuconfig
+  cd $DIR/$VERSION/ && make menuconfig
 }
 dl_1(){
   echo -e "${YELLOW}下载DL库$END"
-  cd $DIR/openwrt/
+  cd $DIR/$VERSION/
   make download V=s
 }
 dl_2(){
-  cd $DIR/openwrt/
+  cd $DIR/$VERSION/
   read -n 1 -p "`echo -e "$YELLOW请输入下载DL库的线程数：$END"`" input1
   read -n 1 -p "`echo -e "$YELLOW请输入下载DL库的次数：$END"`" input2
   [[ $input1 =~ [0-9] ]] || { echo -e "$RED请输入数字$END";exit 1; }
@@ -68,36 +82,36 @@ dl_2(){
   done
 }
 make1(){
-  cd $DIR/openwrt/
+  cd $DIR/$VERSION/
   export FORCE_UNSAFE_CONFIGURE=1
   export FORCE=1
   echo -e "$OTHER开始编译咯！$END"
   make  V=s
 }
 make2(){
-  cd $DIR/openwrt/ && export FORCE_UNSAFE_CONFIGURE=1 && export FORCE=1
+  cd $DIR/$VERSION/ && export FORCE_UNSAFE_CONFIGURE=1 && export FORCE=1
   read -n 1 -p "`echo -e "$YELLOW请输入编译线程数：$END"`" input3
   [[ $input3 =~ [0-9] ]] || { echo -e "$RED请输入数字$END";exit 1; }
   echo -e "$OTHER开始编译咯！$END"
   make -j$input3 V=s
 }
 dirclean2(){
-  cd $DIR/openwrt/ && make dirclean
+  cd $DIR/$VERSION/ && make dirclean
 }
 git2(){
-  cd $DIR/openwrt/ && git pull
+  cd $DIR/$VERSION/ && git pull
 }
 defconfig2(){
-  make defconfig
+  cd $DIR/$VERSION/ && make defconfig
 }
 delete_dir3(){
-  cd $DIR/openwrt/ && rm -rf build_dir/ staging_dir/ tmp/
+  cd $DIR/$VERSION/ && rm -rf build_dir/ staging_dir/ tmp/
 }
 qt5_3(){
-  wget -P $DIR/openwrt/dl/ https://download.qt.io/archive/qt/5.9/5.9.8/single/qt-everywhere-opensource-src-5.9.8.tar.xz
+  wget -P $DIR/$VERSION/dl/ https://download.qt.io/archive/qt/5.9/5.9.8/single/qt-everywhere-opensource-src-5.9.8.tar.xz
 }
 re_config3(){
-  cd $DIR/openwrt/ && rm -rf ./tmp && rm -rf .config
+  cd $DIR/$VERSION/ && rm -rf ./tmp && rm -rf .config
 }
 single_4(){
   config && echo -e "${YELLOW}配置结束，开始下载DL库:  $END"
