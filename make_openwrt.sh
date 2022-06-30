@@ -125,51 +125,51 @@ read -n 1 -p "请输入: "
     ;;
     1)
       while :;do
-      echo -e "$GREEN
-	    (0) 返回上一级 
-	    (1) 切换tag
-	    (2) 安装相关依赖 
-	    (3) 下载源码 
-	    (4) feed更新及安装 
-	    (5) 配置菜单
-	    (6) 下载DL库
-	    (7) 编译
-	    (8) 全部执行
-	    $END" 
+        echo -e "$GREEN
+        (0) 返回上一级 
+	(1) 切换tag
+	(2) 安装相关依赖 
+	(3) 下载源码 
+	(4) feed更新及安装 
+	(5) 配置菜单
+	(6) 下载DL库
+	(7) 编译
+	(8) 全部执行
+	$END" 
       read -n 1 -p "请输入: "
         case $REPLY in
           0)
             break
           ;;
 	  1)
-		tag_1 && echo -e "${GREEN}切换tag--成功$END"||echo -e "${RED}切换tag--失败$END"
+	    tag_1 && echo -e "${GREEN}切换tag--成功$END"||echo -e "${RED}切换tag--失败$END"
 	  ;;
           2)
-	        apt1 && echo -e "${GREEN}安装依赖--成功$END"||echo -e "${RED}安装依赖--失败$END"
+	    apt1 && echo -e "${GREEN}安装依赖--成功$END"||echo -e "${RED}安装依赖--失败$END"
           ;;
           3)
-	        git1 && echo -e "${GREEN}下载源码--成功$END"||echo -e "${RED}下载源码--失败$END"
+	    git1 && echo -e "${GREEN}下载源码--成功$END"||echo -e "${RED}下载源码--失败$END"
           ;;
           4)
-	        feed && echo -e "${GREEN}feed更新及安装--成功$END"||echo -e "${RED}feed更新及安装--失败$END"
+	    feed && echo -e "${GREEN}feed更新及安装--成功$END"||echo -e "${RED}feed更新及安装--失败$END"
           ;;
           5)
-	        config && echo -e "${GREEN}配置菜单--成功$END"||echo -e "${RED}配置菜单--失败$END"
+	    config && echo -e "${GREEN}配置菜单--成功$END"||echo -e "${RED}配置菜单--失败$END"
           ;;
           6)
-	        dl_1 && echo -e "${GREEN}下载DL库--成功$END"||echo -e "${RED}下载DL库--失败$END"
+	    dl_1 && echo -e "${GREEN}下载DL库--成功$END"||echo -e "${RED}下载DL库--失败$END"
           ;;
           7)
-	        make1 && echo -e "${GREEN}编译--成功$END" || echo -e "${RED}编译--失败$END"
+	    make1 && echo -e "${GREEN}编译--成功$END" || echo -e "${RED}编译--失败$END"
           ;;
           8)
-	        tag_1 && echo -e "${GREEN}切换tag--成功$END"||echo -e "${RED}切换tag--失败$END"
-	 	apt1 && echo -e "${GREEN}安装依赖--成功$END"||echo -e "${RED}安装依赖--失败$END"
-		git1 && echo -e "${GREEN}下载源码--成功$END"||echo -e "${RED}下载源码--失败$END"
-		feed && echo -e "${GREEN}feed更新及安装--成功$END"||echo -e "${RED}feed更新及安装--失败$END"
-		config && echo -e "${GREEN}配置菜单--成功$END"||echo -e "${RED}配置菜单--失败$END"
-		dl_1 && echo -e "${GREEN}下载DL库--成功$END"||echo -e "${RED}下载DL库--失败$END"
-		make1 && echo -e "${GREEN}编译--成功$END" || echo -e "${RED}编译--失败$END"
+	    tag_1 && echo -e "${GREEN}切换tag--成功$END"||echo -e "${RED}切换tag--失败$END"
+	    apt1 && echo -e "${GREEN}安装依赖--成功$END"||echo -e "${RED}安装依赖--失败$END"
+	    git1 && echo -e "${GREEN}下载源码--成功$END"||echo -e "${RED}下载源码--失败$END"
+	    feed && echo -e "${GREEN}feed更新及安装--成功$END"||echo -e "${RED}feed更新及安装--失败$END"
+	    config && echo -e "${GREEN}配置菜单--成功$END"||echo -e "${RED}配置菜单--失败$END"
+	    dl_1 && echo -e "${GREEN}下载DL库--成功$END"||echo -e "${RED}下载DL库--失败$END"
+	    make1 && echo -e "${GREEN}编译--成功$END" || echo -e "${RED}编译--失败$END"
           ;;
 	  *)
             echo -e "$RED\t输入错误，请重新输入$END"
@@ -196,38 +196,38 @@ read -n 1 -p "请输入: "
             break
           ;;
           1)
-	        dirclean2 && echo -e "${GREEN}清理所有编译文件--成功$END"||echo -e "${RED}清理所有编译文件--失败$END"
+	    dirclean2 && echo -e "${GREEN}清理所有编译文件--成功$END"||echo -e "${RED}清理所有编译文件--失败$END"
           ;;
           2)
-	        git2 && echo -e "${GREEN}git pull--成功$END"||echo -e "${RED}git pull--失败$END"
+	    git2 && echo -e "${GREEN}git pull--成功$END"||echo -e "${RED}git pull--失败$END"
           ;;
           3)
-	        src2 && echo -e "${GREEN}编译src-git--成功$END"||echo -e "${RED}编译src-git--失败$END"
+	    src2 && echo -e "${GREEN}编译src-git--成功$END"||echo -e "${RED}编译src-git--失败$END"
           ;;
           4)
-	        feed && echo -e "${GREEN}feed更新及安装--成功$END"||echo -e "${RED}feed更新及安装--失败$END"
+	    feed && echo -e "${GREEN}feed更新及安装--成功$END"||echo -e "${RED}feed更新及安装--失败$END"
           ;;
           5)
-	        defconfig2 && echo -e "${GREEN}make defconfig--成功$END"||echo -e "${RED}make defconfig--失败$END"
+	    defconfig2 && echo -e "${GREEN}make defconfig--成功$END"||echo -e "${RED}make defconfig--失败$END"
           ;;
           6)
-	        config && echo -e "${GREEN}配置菜单--成功$END"||echo -e "${RED}配置菜单--失败$END"
+	    config && echo -e "${GREEN}配置菜单--成功$END"||echo -e "${RED}配置菜单--失败$END"
           ;;
           7)
-	        dl_2 && echo -e "${GREEN}下载DL库--成功$END"||echo -e "${RED}下载DL库--失败$END"
+	    dl_2 && echo -e "${GREEN}下载DL库--成功$END"||echo -e "${RED}下载DL库--失败$END"
           ;;
           8)
-	        make2 && echo -e "${GREEN}编译--成功$END"||echo -e "${RED}编译--失败$END"
+	    make2 && echo -e "${GREEN}编译--成功$END"||echo -e "${RED}编译--失败$END"
           ;;
 	  9)
-		dirclean2 && echo -e "${GREEN}清理所有编译文件--成功$END"||echo -e "${RED}清理所有编译文件--失败$END"
-		git2 && echo -e "${GREEN}git pull--成功$END"||echo -e "${RED}git pull--失败$END"
-		src2 && echo -e "${GREEN}编译src-git--成功$END"||echo -e "${RED}编译src-git--失败$END"
-		feed && echo -e "${GREEN}feed更新及安装--成功$END"||echo -e "${RED}feed更新及安装--失败$END"
-		defconfig2 && echo -e "${GREEN}make defconfig--成功$END"||echo -e "${RED}make defconfig--失败$END"
-		config && echo -e "${GREEN}配置菜单--成功$END"||echo -e "${RED}配置菜单--失败$END"
-		dl_2 && echo -e "${GREEN}下载DL库--成功$END"||echo -e "${RED}下载DL库--失败$END"
-		make2 && echo -e "${GREEN}编译--成功$END"||echo -e "${RED}编译--失败$END"
+	    dirclean2 && echo -e "${GREEN}清理所有编译文件--成功$END"||echo -e "${RED}清理所有编译文件--失败$END"
+	    git2 && echo -e "${GREEN}git pull--成功$END"||echo -e "${RED}git pull--失败$END"
+	    src2 && echo -e "${GREEN}编译src-git--成功$END"||echo -e "${RED}编译src-git--失败$END"
+	    feed && echo -e "${GREEN}feed更新及安装--成功$END"||echo -e "${RED}feed更新及安装--失败$END"
+	    defconfig2 && echo -e "${GREEN}make defconfig--成功$END"||echo -e "${RED}make defconfig--失败$END"
+	    config && echo -e "${GREEN}配置菜单--成功$END"||echo -e "${RED}配置菜单--失败$END"
+	    dl_2 && echo -e "${GREEN}下载DL库--成功$END"||echo -e "${RED}下载DL库--失败$END"
+	    make2 && echo -e "${GREEN}编译--成功$END"||echo -e "${RED}编译--失败$END"
           ;;
 	  *)
             echo -e "$RED\t输入错误，请重新输入$END"
@@ -236,12 +236,12 @@ read -n 1 -p "请输入: "
     ;;
     3)
       while :;do
-	    echo -e "$RED
-	    (0) 返回上一级
-		(1) 删除build_dir、staging_dir以及tmp
-		(2) 下载qt5包
-		(3) 重新配置
-	    $END"
+        echo -e "$RED
+        (0) 返回上一级
+	(1) 删除build_dir、staging_dir以及tmp
+        (2) 下载qt5包
+	(3) 重新配置
+	 $END"
       read -n 1 -p "请输入: "
         case $REPLY in
           0)
