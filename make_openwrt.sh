@@ -11,7 +11,7 @@ DIR=${INPUT:-$pwd}
 [ ! -d $DIR ] && mkdir -p $DIR
 cd $DIR ||exit 1
 read -e -p "`echo -e "$YELLOW请选择版本，默认为openwrt，选择lean源码请输入${RED}lean$END    $END"`" INPUT2
-if [ $INPUT2 = "lean" ];then
+if [[ $INPUT2 == "lean" ]];then
   VERSION=lean
 else
   VERSION=openwrt
