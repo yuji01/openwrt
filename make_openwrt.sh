@@ -73,8 +73,8 @@ dl_1(){
 dl_2(){
   cd $DIR/$VERSION/
   read -n 1 -p "`echo -e "$YELLOW请输入下载DL库的线程数：$END"`" input1
-  read -n 1 -p "`echo -e "$YELLOW请输入下载DL库的次数：$END"`" input2
   [[ $input1 =~ [0-9] ]] || { echo -e "$RED请输入数字$END";exit 1; }
+  read -n 1 -p "`echo -e "$YELLOW请输入下载DL库的次数：$END"`" input2
   [[ $input2 =~ [0-9] ]] || { echo -e "$RED请输入数字$END";exit 1; }
   for ((i=1;i<=$input2;i++));do
     echo -e "$OTHER开始第$i次下载DL库$END"
