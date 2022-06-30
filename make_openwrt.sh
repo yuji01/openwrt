@@ -3,7 +3,6 @@ YELLOW='\e[1;33m'
 GREEN='\e[1;32m'
 OTHER="\e[1;$[RANDOM%7+31]m"
 END='\e[0m'
-trap '' int quit
 echo -e "$OTHER此脚本用于编译openwrt固件，不要使用CentOS系统$END"
 pwd=`pwd`
 read -e -p "`echo -e "$YELLOW请选择工作空间，默认为$pwd    $END"`" INPUT
