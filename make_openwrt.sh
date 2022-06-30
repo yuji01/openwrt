@@ -9,6 +9,7 @@ pwd=`pwd`
 read -e -p "`echo -e "$YELLOW请选择工作空间，默认为$pwd    $END"`" INPUT
 DIR=${INPUT:-$pwd}
 [ ! -d $DIR ] && mkdir -p $DIR
+cd $DIR ||exit 1
 os_type(){
   grep centos /etc/os-release &> /dev/null && echo "centos"
 }
@@ -29,23 +30,33 @@ git1(){
     echo -e "${RED}$DIR/openwrt/ 文件已经存在$END"
   fi
 }
+tag_1(){
+  echo -e "$YELLOW此源码包含的tag如下：$END" &&
+  cd $DIR/openwrt/ && git tag
+  read -e -p "请输入你要选择的tag：" input0
+  git checkout $input0 && echo -e "${GREEN}你已经成功切换分支为$END${YELLOW}$input0$END"||echo -e "${RED}切换tag失败$END"
+}
 src2(){
   echo -e "${YELLOW}开始编辑src-git$END"
-  cd $DIR/openwrt/
-  [ ! -e feeds.conf.default.bak ] && cp feeds.conf.default feeds.conf.default.bak
-  vi feeds.conf.default
+  [ ! -e $DIR/openwrt/feeds.conf.default.bak ] && cp $DIR/openwrt/feeds.conf.default $DIR/openwrt/feeds.conf.default.bak
+  vi $DIR/openwrt/feeds.conf.default
 }
 feed(){
   echo -e "$YELLOW更新feed$END" &&
-  cd $DIR/openwrt/scripts/ && /usr/bin/env  perl feeds update -a &&
+  /usr/bin/env  perl $DIR/openwrt/scripts/feeds update -a &&
   echo -e "$YELLOW安装feed$END" &&
-  cd $DIR/openwrt/scripts/ && /usr/bin/env  perl feeds install -a
+  /usr/bin/env  perl $DIR/openwrt/scripts/feeds install -a
 }
 config(){
   echo -e "$OTHER开始配置文件吧$END"
   cd $DIR/openwrt/ && make menuconfig
 }
-dl(){
+dl_1(){
+  echo -e "${YELLOW}下载DL库$END"
+  cd $DIR/openwrt/
+  make download V=s
+}
+dl_2(){
   cd $DIR/openwrt/
   read -n 1 -p "`echo -e "$YELLOW请输入下载DL库的线程数：$END"`" input1
   read -n 1 -p "`echo -e "$YELLOW请输入下载DL库的次数：$END"`" input2
@@ -61,7 +72,7 @@ make1(){
   export FORCE_UNSAFE_CONFIGURE=1
   export FORCE=1
   echo -e "$OTHER开始编译咯！$END"
-  make -j1 V=s
+  make  V=s
 }
 make2(){
   cd $DIR/openwrt/ && export FORCE_UNSAFE_CONFIGURE=1 && export FORCE=1
@@ -90,7 +101,7 @@ re_config3(){
 }
 single_4(){
   config && echo -e "${YELLOW}配置结束，开始下载DL库:  $END"
-  dl && echo -e "${GREEN}下载DL库--成功$END"||echo -e "${RED}下载DL库--失败$END"
+  dl_2 && echo -e "${GREEN}下载DL库--成功$END"||echo -e "${RED}下载DL库--失败$END"
   echo
   read -p "`echo -e "${YELLOW}请输入单独编译插件的名字:  $END"`" name
   echo -e "你输入的插件名字为 $RED${name}$END
@@ -98,7 +109,8 @@ single_4(){
   make package/${name}/compile V=99
 }
 while :;do
-  echo -e "$OTHER
+  echo -e "
+此脚本功能如下：$OTHER
   (0) 退出脚本
   (1) 首次编译
   (2) 二次编译
@@ -113,41 +125,45 @@ read -n 1 -p "请输入: "
     ;;
     1)
       while :;do
-      echo "$GREEN
-	  (0) 返回上一级 
-	  (1) 安装相关依赖 
-	  (2) 下载源码 
-	  (3) feed更新及安装 
-	  (4) 配置菜单
-	  (5) 下载DL库
-	  (6) 编译
-	  (7) 全部执行
-	  $END" 
+      echo -e "$GREEN
+	    (0) 返回上一级 
+	    (1) 切换tag
+	    (2) 安装相关依赖 
+	    (3) 下载源码 
+	    (4) feed更新及安装 
+	    (5) 配置菜单
+	    (6) 下载DL库
+	    (7) 编译
+	    (8) 全部执行
+	    $END" 
       read -n 1 -p "请输入: "
         case $REPLY in
           0)
             break
           ;;
-          1)
+		  1)
+		    tag_1 && echo -e "${GREEN}切换tag--成功$END"||echo -e "${RED}切换tag--失败$END"
+		  ;;
+          2)
 	        apt1 && echo -e "${GREEN}安装依赖--成功$END"||echo -e "${RED}安装依赖--失败$END"
           ;;
-          2)
+          3)
 	        git1 && echo -e "${GREEN}下载源码--成功$END"||echo -e "${RED}下载源码--失败$END"
           ;;
-          3)
+          4)
 	        feed && echo -e "${GREEN}feed更新及安装--成功$END"||echo -e "${RED}feed更新及安装--失败$END"
           ;;
-          4)
+          5)
 	        config && echo -e "${GREEN}配置菜单--成功$END"||echo -e "${RED}配置菜单--失败$END"
           ;;
-          5)
-	        dl && echo -e "${GREEN}下载DL库--成功$END"||echo -e "${RED}下载DL库--失败$END"
-          ;;
           6)
-	        make1 && echo -e "${GREEN}编译--成功$END" || echo -e "${RED}编译--失败$END"
+	        dl_1 && echo -e "${GREEN}下载DL库--成功$END"||echo -e "${RED}下载DL库--失败$END"
           ;;
           7)
-	        apt1 && git1 && feed && config && dl && make1
+	        make1 && echo -e "${GREEN}编译--成功$END" || echo -e "${RED}编译--失败$END"
+          ;;
+          8)
+	        apt1 && git1 && feed && config && dl_1 && make1
 		    [ $? = 0 ] && echo -e "${GREEN}编译--成功$END" || echo -e "${RED}编译--失败$END"
           ;;
 	      *)
@@ -193,13 +209,13 @@ read -n 1 -p "请输入: "
 	        config && echo -e "${GREEN}配置菜单--成功$END"||echo -e "${RED}配置菜单--失败$END"
           ;;
           7)
-	        dl && echo -e "${GREEN}下载DL库--成功$END"||echo -e "${RED}下载DL库--失败$END"
+	        dl_2 && echo -e "${GREEN}下载DL库--成功$END"||echo -e "${RED}下载DL库--失败$END"
           ;;
           8)
 	        make2 && echo -e "${GREEN}编译--成功$END"||echo -e "${RED}编译--失败$END"
           ;;
 		  9)
-	        dirclean2 && git2 && src2 && feed && defconfig2 && config && dl && make2
+	        dirclean2 && git2 && src2 && feed && defconfig2 && config && dl_2 && make2
 		    [ $? = 0 ] && echo -e "${GREEN}编译--成功$END"||echo -e "${RED}编译--失败$END"
           ;;
 	     *)
