@@ -45,7 +45,6 @@ git1(){
   else
     echo -e "${RED}$DIR/$VERSION/ 文件已经存在$END"
   fi
-  else
   if [ ! -d $DIR/$VERSION/ ];then
     echo -e "${YELLOW}开始拉取源码$END"
     git clone https://github.com/coolsnowwolf/lede.git $DIR/$VERSION/
@@ -150,9 +149,9 @@ read -n 1 -p "请输入: "
       while :;do
         echo -e "$GREEN
         (0) 返回上一级 
-	(1) 切换tag
-	(2) 安装相关依赖 
-	(3) 下载源码 
+	(1) 安装相关依赖 
+	(2) 下载源码 
+	(3) 切换tag
 	(4) feed更新及安装 
 	(5) 配置菜单
 	(6) 下载DL库
