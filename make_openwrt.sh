@@ -10,10 +10,10 @@ read -e -p "`echo -e "$YELLOW请选择工作空间，默认为$pwd    $END"`" IN
 DIR=${INPUT:-$pwd}
 [ ! -d $DIR ] && mkdir -p $DIR
 cd $DIR ||exit 1
-echo -e "${YELLOW}请选择版本，默认为openwrt，选择lean源码请输入${RED}lean$END"
+echo -e "${YELLOW}请选择版本，默认为openwrt，选择lean源码请输入${RED}lede$END"
 read -e -p "请输入：" INPUT_VERSION
-if [[ $INPUT_VERSION = "lean" ]];then
-  export VERSION="lean"
+if [[ $INPUT_VERSION = "lede" ]];then
+  export VERSION="lede"
 else
   export VERSION="openwrt"
 fi
@@ -43,16 +43,16 @@ apt1(){
   fi
 }
 git1(){
-  if [ ! -d $DIR/$VERSION/ ];then
+  if [ ! -d $DIR/$VERSION/ -a $VERSION = "openwrt" ];then
     echo -e "${YELLOW}开始拉取源码$END"
-    git clone https://github.com/openwrt/openwrt.git $DIR/ &&
+    git clone https://github.com/openwrt/openwrt.git &&
 	echo -e "${GREEN}下载源码--成功$END"||echo -e "${RED}下载源码--失败$END"
   else
     echo -e "${RED}$DIR/$VERSION/ 文件已经存在$END"
   fi
-  if [ ! -d $DIR/$VERSION/ ];then
+  if [ ! -d $DIR/$VERSION/ -a $VERSION = "lede" ];then
     echo -e "${YELLOW}开始拉取源码$END"
-    git clone https://github.com/coolsnowwolf/lede.git $DIR/ && 
+    git clone https://github.com/coolsnowwolf/lede.git && 
 	echo -e "${GREEN}下载源码--成功$END"||echo -e "${RED}下载源码--失败$END"
   else
     echo -e "${RED}文件存放在 $DIR/$VERSION/$END"
