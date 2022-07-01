@@ -69,7 +69,7 @@ tag_1(){
   echo -e "${YELLOW}此源码包含的tag如下：$END" &&
   cd $DIR/$VERSION/ && git tag
   read -e -p "请输入你要选择的tag：" input0
-  git checkout $input0 && echo -e "${GREEN}你已经成功切换分支为$END$  {YELLOW}$input0$END"||echo -e "${RED}切换tag失败$END"
+  git checkout $input0 && echo -e "${GREEN}你已经成功切换分支为$END${YELLOW} $input0$END"||echo -e "${RED}切换tag失败$END"
 }
 src2(){
   dir_exist &&
@@ -81,10 +81,10 @@ src2(){
 feed(){
   dir_exist &&
   echo -e "${YELLOW}清理feed$END" &&
-  /usr/bin/env  perl $DIR/$VERSION/scripts/feeds clean &&
+  /usr/bin/env  perl $DIR/$VERSION/scripts/feeds clean
   echo -e "${YELLOW}更新feed$END" &&
-  /usr/bin/env  perl $DIR/$VERSION/scripts/feeds update -a &&
-  echo -e "${YELLOW安装}feed$END" &&
+  /usr/bin/env  perl $DIR/$VERSION/scripts/feeds update -a
+  echo -e "${YELLOW安装}feed$END"
   /usr/bin/env  perl $DIR/$VERSION/scripts/feeds install -a &&
   echo -e "${GREEN}feed更新及安装--成功$END"||echo -e "${RED}feed更新及安装--失败$END"
 }
