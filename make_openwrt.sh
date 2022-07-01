@@ -45,14 +45,14 @@ apt1(){
 git1(){
   if [ ! -d $DIR/$VERSION/ ];then
     echo -e "${YELLOW}开始拉取源码$END"
-    git clone https://github.com/openwrt/openwrt.git $DIR/$VERSION/ &&
+    git clone https://github.com/openwrt/openwrt.git $DIR/ &&
 	echo -e "${GREEN}下载源码--成功$END"||echo -e "${RED}下载源码--失败$END"
   else
     echo -e "${RED}$DIR/$VERSION/ 文件已经存在$END"
   fi
   if [ ! -d $DIR/$VERSION/ ];then
     echo -e "${YELLOW}开始拉取源码$END"
-    git clone https://github.com/coolsnowwolf/lede.git $DIR/$VERSION/ && 
+    git clone https://github.com/coolsnowwolf/lede.git $DIR/ && 
 	echo -e "${GREEN}下载源码--成功$END"||echo -e "${RED}下载源码--失败$END"
   else
     echo -e "${RED}文件存放在 $DIR/$VERSION/$END"
