@@ -84,7 +84,7 @@ feed(){
   /usr/bin/env  perl $DIR/$VERSION/scripts/feeds clean
   echo -e "${YELLOW}更新feed$END" &&
   /usr/bin/env  perl $DIR/$VERSION/scripts/feeds update -a
-  echo -e "${YELLOW安装}feed$END"
+  echo -e "${YELLOW}安装feed$END"
   /usr/bin/env  perl $DIR/$VERSION/scripts/feeds install -a &&
   echo -e "${GREEN}feed更新及安装--成功$END"||echo -e "${RED}feed更新及安装--失败$END"
 }
