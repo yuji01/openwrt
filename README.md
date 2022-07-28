@@ -5,4 +5,4 @@
 ```bash
 curl -O https://raw.githubusercontent.com/yuji01/openwrt/main/make_openwrt.sh && chmod +x make_openwrt.sh && ./make_openwrt.sh
 ```
-代码写得烂就烂吧，我又不是码农，只是业余时间写的。
+代码写得烂就烂吧，我又不是码农，只是业余时间写的
